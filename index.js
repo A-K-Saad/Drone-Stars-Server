@@ -39,19 +39,34 @@ const run = async () => {
       });
       res.json(result);
     });
-    //Update a Product
+
+    //Update a product and views
     app.put("/drones", async (req, res) => {
-      const result = await droneCollection.updateOne(
-        { _id: ObjectId(req.body._id) },
-        {
-          $set: {
-            name: req.body.name,
-            price: req.body.price,
-            description: req.body.description,
-          },
-        }
-      );
-      res.json(result);
+      const updateType = req.body.updateType;
+
+      if (updateType === "views") {
+        const result = await droneCollection.updateOne(
+          { _id: ObjectId(req.body._id) },
+          {
+            $set: {
+              views: req.body.views,
+            },
+          }
+        );
+        res.json(result);
+      } else {
+        const result = await droneCollection.updateOne(
+          { _id: ObjectId(req.body._id) },
+          {
+            $set: {
+              name: req.body.name,
+              price: req.body.price,
+              description: req.body.description,
+            },
+          }
+        );
+        res.json(result);
+      }
     });
 
     //Post Users
