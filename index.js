@@ -39,6 +39,20 @@ const run = async () => {
       });
       res.json(result);
     });
+    //Update a Product
+    app.put("/drones", async (req, res) => {
+      const result = await droneCollection.updateOne(
+        { _id: ObjectId(req.body._id) },
+        {
+          $set: {
+            name: req.body.name,
+            price: req.body.price,
+            description: req.body.description,
+          },
+        }
+      );
+      res.json(result);
+    });
 
     //Post Users
     app.post("/users", async (req, res) => {
