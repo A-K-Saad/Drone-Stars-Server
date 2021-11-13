@@ -32,6 +32,13 @@ const run = async () => {
       const result = await droneCollection.insertOne(req.body);
       res.json(result);
     });
+    //Delete a Product
+    app.delete("/drones", async (req, res) => {
+      const result = await droneCollection.deleteOne({
+        _id: ObjectId(req.body._id),
+      });
+      res.json(result);
+    });
 
     //Post Users
     app.post("/users", async (req, res) => {
