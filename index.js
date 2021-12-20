@@ -3,8 +3,14 @@ const cors = require("cors");
 require("dotenv").config();
 
 const { MongoClient, ObjectId } = require("mongodb");
+const Razorpay = require("razorpay");
 const port = process.env.PORT || 5000;
 const app = express();
+
+const instance = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY,
+  key_secret: process.env.RAZORPAY_SECRET,
+});
 
 app.use(cors());
 app.use(express.json());
@@ -127,6 +133,18 @@ const run = async () => {
       const result = await orderCollection.insertOne(order);
       res.json(result);
     });
+
+    app.post("/purchase/:id", async (req, res) => {
+      const options = {
+        amount: req.body.amount, // amount in the smallest currency unit
+        currency: "USD",
+        receipt: "order_rcptid_11",
+      };
+      instance.orders.create(options, (err, order) => {
+        res.send({ orderId: order.id });
+      });
+    });
+
     app.get("/orders", async (req, res) => {
       const result = await orderCollection.find({}).toArray();
       res.json(result);
@@ -169,6 +187,28 @@ const run = async () => {
     app.get("/reviews", async (req, res) => {
       const result = await reviewCollection.find({}).toArray();
       res.json(result);
+    });
+    //Payment
+    app.get("/get-razorpay-key", (req, res) => {
+      res.send({ key: process.env.RAZORPAY_KEY });
+    });
+
+    app.post("/create-order", async (req, res) => {
+      try {
+        const instance = new Razorpay({
+          key_id: process.env.RAZORPAY_KEY,
+          key_secret: process.env.RAZORPAY_SECRET,
+        });
+        const options = {
+          amount: req.body.amount,
+          currency: "USD",
+        };
+        const order = await instance.orders.create(options);
+        if (!order) return res.status(500).send("Some error occured");
+        res.send(order);
+      } catch (error) {
+        res.status(500).send(error);
+      }
     });
   } catch (error) {
     console.log(error);
