@@ -207,6 +207,7 @@ const run = async () => {
         if (!order) return res.status(500).send("Some error occured");
         res.send(order);
       } catch (error) {
+        console.log("Error Occured");
         res.status(500).send(error);
       }
     });
