@@ -28,6 +28,7 @@ const run = async () => {
     const userCollection = database.collection("users");
     const orderCollection = database.collection("orders");
     const reviewCollection = database.collection("reviews");
+    const ratingCollection = database.collection("ratings");
 
     app.get("/drones", async (req, res) => {
       const result = await droneCollection.find({}).toArray();
@@ -73,6 +74,30 @@ const run = async () => {
         );
         res.json(result);
       }
+    });
+
+    //Get Paginated Reviews
+    app.get("/ratings/:droneId", async (req, res) => {
+      const currentPage = parseInt(req.query.currentPage);
+      const limit = parseInt(req.query.limit);
+      const result = await ratingCollection
+        .find({ droneId: req.params.droneId })
+        .skip(currentPage * limit)
+        .limit(limit)
+        .toArray();
+      res.json(result);
+    });
+    //Post Product Reivew
+    app.post("/ratings", async (req, res) => {
+      const result = await ratingCollection.insertOne(req.body);
+      res.json(result);
+    });
+    //Delete Product Review
+    app.delete("/ratings", async (req, res) => {
+      const result = await ratingCollection.deleteOne({
+        _id: ObjectId(req.body._id),
+      });
+      res.json(result);
     });
 
     //Post Users
